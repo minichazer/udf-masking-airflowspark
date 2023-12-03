@@ -24,6 +24,29 @@ os.environ['PYSPARK_PYTHON'] = '/usr/local/bin/python3.8'
 os.environ['PYSPARK_DRIVER_PYTHON'] = '/usr/local/bin/python3.8'
 
 
+"""
+Билд python3.8 на воркера
+
+SSH: docker exec -u root -it <container_id> /bin/bash
+
+apt update && sudo apt upgrade
+apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev \ 
+libssl-dev libsqlite3-dev libreadline-dev libffi-dev curl libbz2-dev -y
+apt install wget
+wget https://www.python.org/ftp/python/3.8.17/Python-3.8.17.tar.xz
+tar -xf Python-3.8.12.tar.xz
+mv Python-3.8.17 /usr/local/share/python3.8
+cd /usr/local/share/python3.8
+./configure --enable-optimizations --enable-shared
+make
+make altinstall
+ldconfig /usr/local/share/python3.8
+
+export PYSPARK_PYTHON=/usr/local/bin/python3.8
+export PYSPARK_DRIVER_PYTHON=/usr/local/bin/python3.8
+"""
+
+
 default_args = {
     'depends_on_past': False,
 }
@@ -84,7 +107,7 @@ def generate_data(**kwargs) -> None:
     fake = Faker()
     uri_DB = kwargs['ti'].xcom_pull(key='uri_DB', task_ids='create_db_connections_task')
 
-    for db_type, conn_id in uri_DB.items():
+    for _, conn_id in uri_DB.items():
         engine = BaseHook.get_connection(conn_id).get_hook()
         table_name = 'newtable'
 
@@ -156,7 +179,7 @@ def import_module(**kwargs) -> None:
 
         main_udf = udf(lambda x: f(x), FloatType())
 
-        for db_type, conn_id in uri_DB.items():
+        for _, conn_id in uri_DB.items():
             conn_config = connection_configs[conn_id]
             df = spark.read \
                 .format("jdbc") \
@@ -186,7 +209,6 @@ with DAG(
         dag=dag
     )
 
-    # добавление случайных данных в БДшки
     t2 = PythonOperator(
         task_id='generate_data_task',
         python_callable=generate_data,
@@ -194,7 +216,6 @@ with DAG(
         dag=dag
     ) 
 
-    # добавление udf и применение к какой-нибудь таблице через датафрейм
     t3 = PythonOperator(
         task_id='import_module_task',
         python_callable=import_module,
