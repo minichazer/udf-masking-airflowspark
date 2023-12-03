@@ -1,0 +1,55 @@
+# netsh interface ipv4 show excludedportrange protocol=tcp - если порты не работают
+# local:container port
+version: '3'
+services:
+  postgres-2:
+    image: postgres:16.1-alpine3.18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /data/postgres
+    volumes:
+       - postgres-2:/data/postgres
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+
+  mysql_server:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: "Pa$$w0rd"
+      MYSQL_DATABASE: "maindb"
+      MYSQL_USER: "admin"
+      MYSQL_PASSWORD: "admin123"
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+
+  # mssql_server:
+  #   image: mcr.microsoft.com/mssql/server
+  #   environment:
+  #     SA_PASSWORD: "Pa$$w0rd!228"
+  #     ACCEPT_EULA: "Y"
+  #   ports:
+  #     - "1433:1433"
+  #   volumes:
+  #     - mssql:/var/opt/mssql
+
+  # oracle_db:
+  #   image: container-registry.oracle.com/database/free:latest
+  #   environment:
+  #     DB_SID: "ORCLCDB"
+  #     DB_PDB: "ORCLPDB1"
+  #     DB_PASSWD: "Pa$$w0rd"
+  #   ports:
+  #     - "1521:1521"
+  #     - "5500:5500"
+  #   volumes:
+  #     - oracle:/opt/oracle/oradata
+
+volumes:
+  postgres-2:
+  #mssql:
+  mysql:
+  #oracle:

@@ -1,0 +1,39 @@
+postgres:
+  conn_id: "DB_postgres"
+  conn_type: "postgresql"
+  description: "Connection to Docker PostgreSQL database"
+  login: "postgre"
+  password: "postgre"
+  host: "127.0.0.1"
+  port: 5433
+  schema: "public"
+
+mssql_server:
+  conn_id: "DB_mssql"
+  conn_type: "mssql"
+  description: "Connection to Docker MS SQL Server database"
+  login: "sa"
+  SA_PASSWORD: "Pa$$w0rd!228"
+  host: "127.0.0.1"
+  port: 1433
+  schema: "dbo"
+
+mysql_server:
+  conn_id: "DB_mysql"
+  conn_type: "mysql"
+  description: "Connection to Docker My SQL Server database"
+  login: "root"
+  password: "Pa$$w0rd"
+  host: "127.0.0.1"
+  port: 3306
+  schema: "mysql"
+
+oracle_db:
+  conn_id: "DB_oracle"
+  conn_type: "oracle"
+  description: "Connection to Docker Oracle database"
+  login: "sys"
+  password: "Pa$$w0rd"
+  host: "127.0.0.1"
+  port: 1521
+  schema: "sys"
