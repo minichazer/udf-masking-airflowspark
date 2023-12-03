@@ -14,6 +14,7 @@ from importlib.machinery import SourceFileLoader
 from datetime import datetime
 from faker import Faker
 
+import config
 import hashlib
 import random
 import os
@@ -27,7 +28,7 @@ os.environ['PYSPARK_DRIVER_PYTHON'] = '/usr/local/bin/python3.8'
 """
 Билд python3.8 на воркера
 
-SSH: docker exec -u root -it <container_id> /bin/bash
+SSH: docker exec -u root -it <worker_container_id> /bin/bash
 
 apt update && sudo apt upgrade
 apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev \ 
@@ -90,13 +91,13 @@ def create_db_connections(**kwargs) -> None:
         connection_configs[db_param['conn_id']] = {
             'conn_id':db_param['conn_id'],
             'db_type': db_param['conn_type'],
-            'host': '192.168.1.53',
+            'host': config.host_ip,
             'driver': drivers_dict[db_param['conn_type']],
             'port': db_param['port'],
             'user': db_param['login'],
             'password': db_param['password'],
             'target_name': db_param['target_name'],
-            'url': f"jdbc:{db_param['conn_type']}://192.168.1.53:{db_param['port']}/{db_param['target_name']}"
+            'url': f"jdbc:{db_param['conn_type']}://{config.host_ip}:{db_param['port']}/{db_param['target_name']}"
         }
         uri_DB[db_param['conn_type']] = db_param['conn_id']
     kwargs['ti'].xcom_push(key='uri_DB', value=uri_DB)
@@ -154,7 +155,7 @@ def generate_data(**kwargs) -> None:
 
 
 def import_module(**kwargs) -> None:
-    master_url = "spark://9585c32b5aea:7077"
+    master_url = config.master_spark_url
     drivers_list = [
         'mysql-connector-java-8.0.13.jar',
         'postgresql-42.7.0.jar',
